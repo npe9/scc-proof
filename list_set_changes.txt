@@ -1,0 +1,198 @@
+< Fixpoint list_remove (x : A) (l : list A) {struct l} : list A :=
+<   match l with
+<   | nil => nil
+<   | y::tl => if (eq_dec x y) then list_remove x tl else y::(list_remove x tl)
+<   end.
+< 
+< Lemma list_remove_mem : forall x l, ~LP.mem x (list_remove x l).
+< Proof.
+< intros x l.
+< induction l.
+< simpl list_remove.
+< intuition.
+< simpl list_remove.
+< destruct eq_dec.
+< assumption.
+< simpl LP.mem.
+< intuition.
+< Qed.
+< 
+< Lemma list_remove_mem2 : forall x y l, LP.mem x (list_remove y l) -> LP.mem x l.
+< intros x y l.
+< induction l.
+< auto.
+< simpl list_remove.
+< destruct eq_dec.
+< intro H.
+< apply IHl in H.
+< simpl LP.mem.
+< auto.
+< simpl LP.mem.
+< intro H.
+< assert (forall A B C : Prop, A \/ B -> ( B -> C ) -> ( A \/ C)).
+< tauto.
+< apply (H0 (EDS.eq_A x a) (LP.mem x (list_remove y l)) (LP.mem x l)).
+< assumption.
+< assumption.
+< Qed.
+< 
+< Lemma list_remove_mkset1 :
+<   forall e l,
+<   LP.mem e l -> mem e (
+<     mk_set (remove_red l) ( without_red_remove_red l )
+<    ).
+< Proof.
+< intros e l H.
+< unfold mem.
+< unfold support.
+< apply remove_red_included.
+< assumption.
+< Qed.
+< 
+< Lemma list_remove_mkset2_aux : forall l e p, mem e (mk_set l p) -> LP.mem e l.
+< Proof.
+< intros l e p H.
+< unfold mem in H.
+< unfold support in H.
+< assumption.
+< Qed.
+< 
+< Lemma list_remove_mkset2 :
+<   forall e l,
+<   mem e (
+<     mk_set (remove_red l) ( without_red_remove_red l )
+<    ) -> LP.mem e l.
+< Proof.
+< intros e l H.
+< apply included_remove_red.
+< apply (list_remove_mkset2_aux (remove_red l) e (without_red_remove_red l)).
+< assumption.
+< Qed.
+< 
+< Lemma list_remove_mkset3 :
+<   forall e l,
+<   mem e (
+<     mk_set (remove_red l) ( without_red_remove_red l )
+<    ) <-> LP.mem e l.
+< Proof.
+< unfold iff.
+< intros e l.
+< apply conj.
+< apply list_remove_mkset2.
+< apply list_remove_mkset1.
+< Qed.
+< 
+< Lemma logic1 : forall P Q, (P <-> Q) -> (~P -> ~ Q).
+< tauto.
+< Qed.
+< 
+< Lemma logic2 : forall P Q, (P <-> Q) -> (~Q -> ~ P).
+< tauto.
+< Qed.
+< 
+< Lemma list_remove_mkset4 :
+<   forall e l,
+<   ~LP.mem e l -> ~mem e (
+<     mk_set (remove_red l) ( without_red_remove_red l )
+<    ).
+< Proof.
+< intros e l.
+< apply logic2.
+< apply list_remove_mkset3.
+< Qed.
+< 
+< Lemma list_remove_mkset5 : forall e l,
+<   ~mem e (
+<     mk_set (remove_red l) ( without_red_remove_red l )
+<    ) -> ~LP.mem e l.
+< Proof.
+< intros e l.
+< apply logic1.
+< apply list_remove_mkset3.
+< Qed.
+< 
+< Definition remove (e:A) (s:t) : t :=
+<   mk_set
+<   ( remove_red (list_remove e s.(support)) )
+<   (without_red_remove_red (list_remove e s.(support))).
+< 
+< Lemma remove_mem : forall e s, ~mem e (remove e s).
+< Proof.
+< unfold remove.
+< intros e s.
+< destruct s as [supp is_set].
+< simpl support.
+< induction supp.
+< intuition.
+< simpl list_remove.
+< destruct eq_dec.
+< assert (without_red supp) as Hwrs.
+< apply (without_red_remove a nil).
+< assumption.
+< apply IHsupp.
+< assumption.
+< assert (without_red supp).
+< apply (without_red_remove a nil).
+< assumption.
+< apply IHsupp in H.
+< apply list_remove_mkset4.
+< simpl LP.mem.
+< assert (forall A B : Prop, ~A -> ~B -> ~( A \/ B )).
+< tauto.
+< apply H0.
+< assumption.
+< apply list_remove_mkset5.
+< assumption.
+< Defined.
+< 
+< 
+< Lemma remove_subset : forall e s, subset (remove e s) s.
+< Proof.
+< intros e s.
+< induction s as [supp isset].
+< unfold subset.
+< unfold remove.
+< induction supp.
+< auto.
+< simpl list_remove.
+< destruct eq_dec.
+< intros e1 Hmem.
+< assert (without_red (supp)).
+< apply (without_red_remove a nil).
+< trivial.
+< assert (mem e1 (mk_set supp H)).
+< apply (IHsupp H e1 Hmem).
+< unfold mem.
+< simpl LP.mem.
+< right.
+< unfold mem in H0.
+< simpl support in H0.
+< assumption.
+< intros e0 Hmem.
+< apply list_remove_mkset2 in Hmem.
+< unfold mem.
+< simpl LP.mem.
+< simpl LP.mem in Hmem.
+< assert (forall A B C : Prop, A \/ B -> (B -> C) -> A \/ C).
+< tauto.
+< apply (H (EDS.eq_A e0 a) (LP.mem e0 (list_remove e supp)) (LP.mem e0 supp)).
+< assumption.
+< intro.
+< apply (list_remove_mem2 e0 e).
+< assumption.
+< Qed.
+< 
+< Lemma remove_cardinal : forall e s, mem e s -> cardinal (remove e s) < cardinal s.
+< Proof.
+< intros e s H.
+< induction s as [supp isset].
+< induction supp.
+< compute in H.
+< contradiction.
+< apply (subset_cardinal_not_eq_not_eq_set
+<   (s2:=(mk_set (a :: supp) isset))
+<   (s1:=(remove e (mk_set (a :: supp) isset))) e).
+< apply remove_subset.
+< apply remove_mem.
+< assumption.
+< Qed.

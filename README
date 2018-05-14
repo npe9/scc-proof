@@ -1,0 +1,24 @@
+This is the program SCC-PROOF-0.9.
+
+It  gives  the  termination  proof  for  an  algorithme  of  strongly  connected
+components in COQ (http://coq.inria.fr).
+
+SCC-PROOF is based on the Coccinelle library
+(http://www.lri.fr/~contejea/Coccinelle/coccinelle.html).
+
+SCC-PROOF is released under the terms  of  the  CeCILL  licence.  See  the  file
+Licence.en.txt for more details
+
+--------------------------------------------------------------------------------
+
+Ceci est le programme SCC-PROOF-0.9.
+
+Il  donne  la  preuve  de  terminaison  pour  un  algorithme   des   composantes
+fortement connexes en COQ (http://coq.inria.fr).
+
+SCC-PROOF est basé sur la librarie Cocinelle
+(http://www.lri.fr/~contejea/Coccinelle/coccinelle.html).
+
+SCC-PROOf est distribué sous les termes de  la  licence  CeCILL.  Consultez  le
+fichier Licence.fr.txt pour plus de détails.
+
